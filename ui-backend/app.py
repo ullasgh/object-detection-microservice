@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+﻿from flask import Flask, request, jsonify, send_file
 from werkzeug.utils import secure_filename
 import requests
 import os
@@ -66,7 +66,9 @@ def detect():
                     f.write(img_r.content)
                 data["output_url"] = f"/output/{out}"
 
-        return jsonify(data), 200
+        if "output_json" in data:
+    data["output_json_url"] = f"/output/{data['output_json']}"
+return jsonify(data), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
