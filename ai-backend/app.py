@@ -1,50 +1,82 @@
 ﻿from flask import Flask, request, jsonify, send_file
 from werkzeug.utils import secure_filename
-import cv2, numpy as np, os
+import requests
+import os
 from pathlib import Path
-from utils import load_yolo_model, detect_objects, draw_detections
 
 app = Flask(__name__)
-app.config.update(UPLOAD_FOLDER='uploads', OUTPUT_FOLDER='outputs', MODEL_FOLDER='models', MAX_CONTENT_LENGTH=16*1024*1024)
-[Path(p).mkdir(exist_ok=True) for p in [app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER']]]
+app.config.update(
+    UPLOAD_FOLDER="uploads",
+    OUTPUT_FOLDER="outputs",
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024
+)
 
-ALLOWED_EXT = {'png','jpg','jpeg'}
-def allowed(f): return '.' in f and f.rsplit('.',1)[1].lower() in ALLOWED_EXT
+# Create folders if missing
+[Path(p).mkdir(exist_ok=True) for p in [app.config["UPLOAD_FOLDER"], app.config["OUTPUT_FOLDER"]]]
 
-try:
-    net, classes, out_layers = load_yolo_model(app.config['MODEL_FOLDER'])
-    app.logger.info("YOLO model loaded.")
-except Exception as e:
-    app.logger.error(f"Model load failed: {e}")
-    net, classes, out_layers = None, None, None
+# URL of the AI backend
+AI_URL = os.environ.get("AI_BACKEND_URL", "http://127.0.0.1:5001")
 
-@app.route('/health')
-def health(): return jsonify({'status':'ok' if net else 'model_not_loaded'}),200
+ALLOWED = {"png", "jpg", "jpeg"}
 
-@app.route('/detect', methods=['POST'])
-def detect():
-    if net is None: return jsonify({'error':'Model not loaded'}),503
-    if 'image' not in request.files: return jsonify({'error':'No image'}),400
-    f = request.files['image']
-    if f.filename=='': return jsonify({'error':'Empty filename'}),400
-    if not allowed(f.filename): return jsonify({'error':'Invalid type'}),400
-    name = secure_filename(f.filename)
-    path = os.path.join(app.config['UPLOAD_FOLDER'], name); f.save(path)
-    img = cv2.imread(path)
-    if img is None: return jsonify({'error':'Read fail'}),400
+def allowed(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED
+
+@app.route("/health")
+def health():
+    """Health check for UI and AI backend"""
     try:
-        dets = detect_objects(net, out_layers, classes, img)
-        out = draw_detections(img.copy(), dets)
-        out_name = f"result_{name}"
-        cv2.imwrite(os.path.join(app.config['OUTPUT_FOLDER'], out_name), out)
-        return jsonify({'detections':dets,'output_filename':out_name}),200
+        r = requests.get(f"{AI_URL}/health", timeout=3)
+        return jsonify({"ui": "ok", "ai": r.json()}), 200
     except Exception as e:
-        app.logger.exception("Detection failed"); return jsonify({'error':str(e)}),500
+        return jsonify({"ui": "ok", "ai": {"status": "down", "error": str(e)}}), 200
 
-@app.route('/output/<fname>')
-def get_out(fname):
-    p=os.path.join(app.config['OUTPUT_FOLDER'],secure_filename(fname))
-    return send_file(p) if os.path.exists(p) else (jsonify({'error':'Not found'}),404)
+@app.route("/detect", methods=["POST"])
+def detect():
+    """Upload image, send to AI backend, and return detections"""
+    if "image" not in request.files:
+        return jsonify({"error": "No image"}), 400
 
-if __name__=='__main__':
-    app.run(host='0.0.0.0',port=5001,debug=True)
+    f = request.files["image"]
+    if f.filename == "":
+        return jsonify({"error": "Empty filename"}), 400
+    if not allowed(f.filename):
+        return jsonify({"error": "Invalid file type"}), 400
+
+    name = secure_filename(f.filename)
+    upload_path = os.path.join(app.config["UPLOAD_FOLDER"], name)
+    f.save(upload_path)
+
+    try:
+        # Send to AI backend
+        with open(upload_path, "rb") as img_file:
+            r = requests.post(f"{AI_URL}/detect", files={"image": img_file}, timeout=60)
+
+        if r.status_code != 200:
+            return jsonify({"error": "AI backend failed", "details": r.text}), r.status_code
+
+        data = r.json()
+        out = data.get("output_filename")
+
+        # Fetch and save result image from AI backend
+        if out:
+            img_r = requests.get(f"{AI_URL}/output/{out}", timeout=60)
+            if img_r.status_code == 200:
+                output_path = os.path.join(app.config["OUTPUT_FOLDER"], out)
+                with open(output_path, "wb") as f:
+                    f.write(img_r.content)
+                data["output_url"] = f"/output/{out}"
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/output/<filename>")
+def output(filename):
+    """Serve processed image"""
+    path = os.path.join(app.config["OUTPUT_FOLDER"], secure_filename(filename))
+    return send_file(path) if os.path.exists(path) else (jsonify({"error": "Not found"}), 404)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5001, debug=True)
