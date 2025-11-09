@@ -15,7 +15,7 @@ app.config.update(
 [Path(p).mkdir(exist_ok=True) for p in [app.config["UPLOAD_FOLDER"], app.config["OUTPUT_FOLDER"]]]
 
 # URL of the AI backend
-AI_URL = os.environ.get("AI_BACKEND_URL", "http://127.0.0.1:5000")
+AI_URL = os.environ.get("AI_BACKEND_URL", "http://127.0.0.1:5001")
 
 ALLOWED = {"png", "jpg", "jpeg"}
 

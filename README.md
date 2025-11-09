@@ -1,27 +1,27 @@
-﻿# Object Detection Microservice System
+# Object Detection Microservice System
 
 A production-ready microservice system for object detection using YOLOv3, built with Flask and Docker.
 
-## 🏗️ Architecture
+## ??? Architecture
 
 \\\
-┌─────────────┐         ┌─────────────┐
-│   Client    │────────▶│ UI Backend  │
-│             │         │   (Flask)   │
-└─────────────┘         │  Port: 5000 │
-                        └──────┬──────┘
-                               │
++-------------+         +-------------+
+�   Client    �--------?� UI Backend  �
+�             �         �   (Flask)   �
++-------------+         �  Port: 5000 �
+                        +-------------+
+                               �
                           HTTP POST
-                               │
-                        ┌──────▼──────┐
-                        │ AI Backend  │
-                        │   (Flask)   │
-                        │  Port: 5001 │
-                        │   + YOLOv3  │
-                        └─────────────┘
+                               �
+                        +------?------+
+                        � AI Backend  �
+                        �   (Flask)   �
+                        �  Port: 5000 (UI) and 5001 (AI) �
+                        �   + YOLOv3  �
+                        +-------------+
 \\\
 
-## ✨ Features
+## ? Features
 
 - **Microservice Architecture**: Separated UI and AI backends for scalability
 - **Object Detection**: YOLOv3 with COCO dataset (80 object classes)
@@ -31,7 +31,7 @@ A production-ready microservice system for object detection using YOLOv3, built 
 - **JSON Output**: Structured detection results with confidence scores
 - **Visual Output**: Images with bounding boxes and labels
 
-## 🚀 Quick Start
+## ?? Quick Start
 
 ### Prerequisites
 
@@ -58,7 +58,7 @@ docker-compose up --build
 \\\ash
 # 1. Check health endpoints
 curl http://localhost:5000/health
-curl http://localhost:5001/health
+curl http://localhost:5000 (UI) and 5001 (AI)/health
 
 # 2. Detect objects in an image
 curl -X POST -F "image=@path/to/your/image.jpg" http://localhost:5000/detect
@@ -68,7 +68,7 @@ curl -X POST -F "image=@path/to/your/image.jpg" http://localhost:5000/detect
 # - JSON detection results: ui-backend/outputs/
 \\\
 
-## 📡 API Documentation
+## ?? API Documentation
 
 ### UI Backend API (Port 5000)
 
@@ -128,36 +128,36 @@ curl http://localhost:5000/health
 # Response: {"status": "healthy", "service": "ui-backend"}
 \\\
 
-## 📁 Project Structure
+## ?? Project Structure
 
 \\\
 object-detection-microservice/
-├── docker-compose.yml          # Multi-container orchestration
-├── README.md                   # This file
-├── IMPLEMENTATION_GUIDE.md     # Detailed implementation docs
-├── .gitignore                  # Git ignore rules
-├── test_api.sh                 # Testing script
-│
-├── ui-backend/                 # User Interface Backend Service
-│   ├── Dockerfile              # Container configuration
-│   ├── requirements.txt        # Python dependencies
-│   ├── app.py                  # Flask application
-│   ├── uploads/                # Uploaded images (temporary)
-│   └── outputs/                # Processed results
-│
-├── ai-backend/                 # AI Processing Backend Service
-│   ├── Dockerfile              # Container configuration
-│   ├── requirements.txt        # Python dependencies
-│   ├── app.py                  # Flask application
-│   ├── utils.py                # YOLO detection utilities
-│   ├── models/                 # YOLOv3 model files (auto-downloaded)
-│   ├── uploads/                # Received images
-│   └── outputs/                # Processed images with boxes
-│
-└── test_images/                # Sample test images
++-- docker-compose.yml          # Multi-container orchestration
++-- README.md                   # This file
++-- IMPLEMENTATION_GUIDE.md     # Detailed implementation docs
++-- .gitignore                  # Git ignore rules
++-- test_api.sh                 # Testing script
+�
++-- ui-backend/                 # User Interface Backend Service
+�   +-- Dockerfile              # Container configuration
+�   +-- requirements.txt        # Python dependencies
+�   +-- app.py                  # Flask application
+�   +-- uploads/                # Uploaded images (temporary)
+�   +-- outputs/                # Processed results
+�
++-- ai-backend/                 # AI Processing Backend Service
+�   +-- Dockerfile              # Container configuration
+�   +-- requirements.txt        # Python dependencies
+�   +-- app.py                  # Flask application
+�   +-- utils.py                # YOLO detection utilities
+�   +-- models/                 # YOLOv3 model files (auto-downloaded)
+�   +-- uploads/                # Received images
+�   +-- outputs/                # Processed images with boxes
+�
++-- test_images/                # Sample test images
 \\\
 
-## 🛠️ Technology Stack
+## ??? Technology Stack
 
 | Component | Technology | Version | Purpose |
 |-----------|-----------|---------|---------|
@@ -168,7 +168,7 @@ object-detection-microservice/
 | **Orchestration** | Docker Compose | Latest | Multi-container mgmt |
 | **Language** | Python | 3.9 | Primary language |
 
-## 📊 Performance
+## ?? Performance
 
 - **Model loading**: 5-10 seconds (one-time at startup)
 - **Detection per image**: 2-5 seconds (CPU)
@@ -177,7 +177,7 @@ object-detection-microservice/
 - **Max file size**: 16MB
 - **Detectable objects**: 80 classes (COCO dataset)
 
-## 🔧 Configuration
+## ?? Configuration
 
 ### Environment Variables
 
@@ -185,7 +185,7 @@ Edit \docker-compose.yml\ to customize:
 
 \\\yaml
 environment:
-  - AI_BACKEND_URL=http://ai-backend:5001  # AI service URL
+  - AI_BACKEND_URL=http://ai-backend:5000 (UI) and 5001 (AI)  # AI service URL
 \\\
 
 ### Detection Parameters
@@ -198,7 +198,7 @@ def detect_objects(image, net, classes, output_layers,
                    nms_threshold=0.4):    # NMS threshold
 \\\
 
-## 🐛 Troubleshooting
+## ?? Troubleshooting
 
 ### Port Already in Use
 \\\yaml
@@ -226,7 +226,7 @@ docker network inspect object-detection-microservice_app-network
 docker exec object-detection-microservice-ui-backend-1 ping ai-backend
 \\\
 
-## 🛑 Stopping Services
+## ?? Stopping Services
 
 \\\ash
 # Stop containers
@@ -239,12 +239,12 @@ docker-compose down -v
 docker-compose down -v --rmi all
 \\\
 
-## 📚 Documentation
+## ?? Documentation
 
 For detailed implementation guide, design decisions, and architecture details:
 - [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) - Complete implementation documentation
 
-## 🧪 Testing
+## ?? Testing
 
 \\\ash
 # Run test script (Linux/Mac/Git Bash)
@@ -261,7 +261,7 @@ curl -X POST -F "image=@test.jpg" http://localhost:5000/detect | jq
 curl http://localhost:5000/output/test.jpg --output result.jpg
 \\\
 
-## 🎯 Use Cases
+## ?? Use Cases
 
 - **Security & Surveillance**: Detect people, vehicles in camera feeds
 - **Retail Analytics**: Count customers, track products
@@ -269,7 +269,7 @@ curl http://localhost:5000/output/test.jpg --output result.jpg
 - **Wildlife Monitoring**: Animal detection in camera traps
 - **Quality Control**: Object inspection in manufacturing
 
-## 🚀 Future Enhancements
+## ?? Future Enhancements
 
 ### Planned Features
 - [ ] Batch image processing
@@ -281,17 +281,17 @@ curl http://localhost:5000/output/test.jpg --output result.jpg
 - [ ] Prometheus metrics & monitoring
 - [ ] Authentication & rate limiting
 
-## 📄 License
+## ?? License
 
 This project is created for technical assessment purposes.
 
-## 👤 Author
+## ?? Author
 
 **Technical Assessment Submission**
 - GitHub: [@ullasgh](https://github.com/ullasgh)
 - Repository: [object-detection-microservice](https://github.com/ullasgh/object-detection-microservice)
 
-## 🙏 Acknowledgments
+## ?? Acknowledgments
 
 - YOLOv3: Joseph Redmon - https://pjreddie.com/darknet/yolo/
 - COCO Dataset: https://cocodataset.org/
@@ -300,4 +300,4 @@ This project is created for technical assessment purposes.
 
 ---
 
-**Built with ❤️ for production-ready AI microservices**
+**Built with ?? for production-ready AI microservices**
