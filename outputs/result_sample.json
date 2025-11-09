@@ -1,0 +1,11 @@
+﻿{
+  "detections": [
+    {
+      "bounding_box": { "height": 207, "width": 193, "x": 4, "y": 20 },
+      "class": "dog",
+      "confidence": 0.9906169772148132
+    }
+  ],
+  "output_filename": "result_sample.jpeg",
+  "output_url": "/output/result_sample.jpeg"
+}

@@ -1,0 +1,51 @@
+﻿{
+  "detections": [
+    {
+      "bounding_box": { "height": 267, "width": 208, "x": 215, "y": 80 },
+      "class": "horse",
+      "confidence": 0.9938621520996094
+    },
+    {
+      "bounding_box": { "height": 202, "width": 77, "x": 272, "y": 20 },
+      "class": "person",
+      "confidence": 0.9908727407455444
+    },
+    {
+      "bounding_box": { "height": 56, "width": 19, "x": 430, "y": 123 },
+      "class": "person",
+      "confidence": 0.9784518480300903
+    },
+    {
+      "bounding_box": { "height": 138, "width": 54, "x": 141, "y": 202 },
+      "class": "dog",
+      "confidence": 0.9306578636169434
+    },
+    {
+      "bounding_box": { "height": 87, "width": 125, "x": 7, "y": 106 },
+      "class": "truck",
+      "confidence": 0.8417671918869019
+    },
+    {
+      "bounding_box": { "height": 15, "width": 7, "x": 403, "y": 131 },
+      "class": "person",
+      "confidence": 0.8158503174781799
+    },
+    {
+      "bounding_box": { "height": 13, "width": 7, "x": 415, "y": 135 },
+      "class": "person",
+      "confidence": 0.5821760296821594
+    },
+    {
+      "bounding_box": { "height": 13, "width": 6, "x": 424, "y": 134 },
+      "class": "person",
+      "confidence": 0.566646933555603
+    },
+    {
+      "bounding_box": { "height": 10, "width": 7, "x": 477, "y": 130 },
+      "class": "person",
+      "confidence": 0.5214740633964539
+    }
+  ],
+  "output_filename": "result_sample2.jpg",
+  "output_url": "/output/result_sample2.jpg"
+}
