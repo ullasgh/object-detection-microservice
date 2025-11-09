@@ -26,7 +26,7 @@ def allowed(filename):
 def health():
     """Health check for UI and AI backend"""
     try:
-        r = requests.get(f"{AI_URL}/health", timeout=3)
+        r = requests.get(f"{AI_URL}/health", timeout=10)
         return jsonify({"ui": "ok", "ai": r.json()}), 200
     except Exception as e:
         return jsonify({"ui": "ok", "ai": {"status": "down", "error": str(e)}}), 200
