@@ -11,6 +11,7 @@ app.config.update(
     MAX_CONTENT_LENGTH=16 * 1024 * 1024
 )
 
+# Create folders if missing
 [Path(p).mkdir(exist_ok=True) for p in [app.config["UPLOAD_FOLDER"], app.config["OUTPUT_FOLDER"]]]
 
 # URL of the AI backend
@@ -79,3 +80,4 @@ def output(filename):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
